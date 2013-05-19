@@ -201,7 +201,7 @@
           filename: "oven.user.iced",
           funcname: "Oven.init"
         });
-        _this.install('io.github.maxtaco.iced.compiler', 'https://maxtaco.github.io/coffee-script/extras/coffee-script.js', __iced_deferrals.defer({
+        _this.install('io.github.maxtaco.iced.compiler', 'https://github.com/maxtaco/coffee-script/raw/gh-pages/extras/coffee-script.js', __iced_deferrals.defer({
           assign_fn: (function() {
             return function() {
               return data = arguments[0];

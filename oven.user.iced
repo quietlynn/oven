@@ -115,7 +115,7 @@ class Oven
 
     await @install(
       'io.github.maxtaco.iced.compiler',
-      'https://maxtaco.github.io/coffee-script/extras/coffee-script.js',
+      'https://github.com/maxtaco/coffee-script/raw/gh-pages/extras/coffee-script.js',
       defer(data), 'bypass_cache')
     if data
       await @install(
