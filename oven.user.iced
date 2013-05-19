@@ -77,7 +77,8 @@ class Oven
     @storage = window.localStorage
     @sync_interval = 0
     @version = 0
-    @updateUrl = 'https://github.com/quietlynn/oven/raw/master/oven.user.js'
+    @updateUrl = (@storage['ExtOvenUpdateUrl'] ?
+        'https://github.com/quietlynn/oven/raw/master/oven.user.js')
 
   load: (callback) ->
     snip = @storage['ExtOvenSnippets']
@@ -93,6 +94,19 @@ class Oven
       @snippets[name] = data
     callback() if callback
     return true
+
+  version_compare: (v1, v2) ->
+    sv1 = v1.split "."
+    sv2 = v2.split "."
+    for i in [0..(sv1.length - 1)]
+      return 1 if sv2.length - 1 < i
+      i1 = parseInt sv1[i]
+      i2 = parseInt sv2[i]
+      return 1 if i1 > i2
+      return -1 if i1 < i2
+
+    return 0 if sv1.length == sv2.length
+    return -1
 
   init: (callback) ->
     @storage['ExtOvenUpdateDate'] = new Date()
@@ -202,16 +216,20 @@ class Oven
   parse: (name, url, code) ->
     data = {}
     data.deps = []
+    data.opts = []
     reg = /(?:\n|^)\s*OVEN::(\w+)\s+(.*)/g
     while result = reg.exec(code)
       [_, field, value] = result
       if field == 'require'
         [dep, dep_url] = value.split /\s+/
         data.deps.push dep
-        if not @snippets[dep]?
+        if not @has(dep)
           data.missing ?= {}
           data.missing[dep] = dep_url
-      else if ['deps', 'builtin', 'disabled'].indexOf(field) < 0
+      else if field == 'optional'
+        [dep, dep_url] = value.split /\s+/
+        data.opts.push dep
+      else if ['deps', 'opts', 'builtin', 'disabled'].indexOf(field) < 0
         data[field] = value
     
     data.url = url
@@ -237,12 +255,13 @@ class Oven
     now = new Date()
     await
       if now - new Date(@storage['ExtOvenUpdateDate']) > @sync_interval
-        ((autocb) =>
-          await @xhr @updateUrl, defer(code), bypass_cache
-          if code?
-            @storage['ExtOvenCode'] = code
-            @storage['ExtOvenUpdateDate'] = now
-        )(defer())
+        if @updateUrl
+          ((autocb) =>
+            await @xhr @updateUrl, defer(code), bypass_cache
+            if code?
+              @storage['ExtOvenCode'] = code
+              @storage['ExtOvenUpdateDate'] = now
+          )(defer())
       for name, data of @snippets
         if data.url != null and not @snippets[name].disabled
           if now - new Date(data.last_update) > @sync_interval
@@ -265,8 +284,12 @@ class Oven
 
   run: (name) ->
     if @status[name] != 'loaded' and not @snippets[name].disabled
-      for dep in @snippets[name].deps
+      data = @snippets[name]
+      for dep in data.deps
         @run dep
+      if data.opts
+        for opt in data.opts
+          @run opt if @has(opt)
       console.log 'Oven::run ' + name
       @execute @snippets[name].code, name
       @status[name] = 'loaded'
@@ -281,6 +304,8 @@ class Oven
     } catch (ex) { console.log(ex.toString()); } })
     """
     fn(@api)
+
+  has: (name) -> @snippets[name]?
 
   add: (name, data) ->
     @snippets[name] = data
