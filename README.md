@@ -33,3 +33,7 @@ Snippets
 ========
 Snippets can be hosted anywhere including Github. However, this project only
 focuses on the manager itself and therefore contains only the builtin snippets.
+
+Some of my snippets for Google+ can be found [here][oven-gplus].
+
+[oven-gplus]: https://github.com/quietlynn/oven-gplus
