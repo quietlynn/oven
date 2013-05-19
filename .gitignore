@@ -1,0 +1,6 @@
+# compiled sources and maps
+*.map
+*.js
+
+# Include compiled userscripts so that they can be installed directly from Github.
+!*.user.js
