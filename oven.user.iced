@@ -166,6 +166,7 @@ class Oven
       url += (if (/\?/).test(url) then "&" else "?") + (new Date()).getTime()
 
     onreadystatechange = (xhr) ->
+      xhr = xhr.target if xhr.target
       if xhr.readyState == 4
         if callback
           if xhr.status == 200

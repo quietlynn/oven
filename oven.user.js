@@ -298,6 +298,7 @@
         url += (/\?/.test(url) ? "&" : "?") + (new Date()).getTime();
       }
       onreadystatechange = function(xhr) {
+        if (xhr.target) xhr = xhr.target;
         if (xhr.readyState === 4) {
           if (callback) {
             if (xhr.status === 200) {
@@ -357,7 +358,7 @@
               return code = arguments[0];
             };
           })(),
-          lineno: 203
+          lineno: 204
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -388,7 +389,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 212
+          lineno: 213
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -403,7 +404,7 @@
                   funcname: "Oven.install"
                 });
                 _this.install_all(data.missing, __iced_deferrals.defer({
-                  lineno: 216
+                  lineno: 217
                 }), bypass_cache);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -438,7 +439,7 @@
         for (dep_name in deps) {
           dep_url = deps[dep_name];
           _this.install(dep_name, dep_url, __iced_deferrals.defer({
-            lineno: 225
+            lineno: 226
           }), bypass_cache);
         }
         __iced_deferrals._fulfill();
@@ -520,7 +521,7 @@
                       return code = arguments[0];
                     };
                   })(),
-                  lineno: 272
+                  lineno: 273
                 }), bypass_cache || !_this.storage['ExtOvenCode']);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -533,7 +534,7 @@
                 return;
               });
             })(__iced_deferrals.defer({
-              lineno: 277
+              lineno: 278
             }));
           }
         }
@@ -552,7 +553,7 @@
                     filename: "oven.user.iced"
                   });
                   _this.install(name, data.url, __iced_deferrals.defer({
-                    lineno: 282
+                    lineno: 283
                   }), bypass_cache);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -560,7 +561,7 @@
                   return;
                 });
               })(__iced_deferrals.defer({
-                lineno: 284
+                lineno: 285
               }), name, data.builtin);
             } else {
               _this.snippets[name].last_update = now;
@@ -685,7 +686,7 @@
       filename: "oven.user.iced"
     });
     d = __iced_deferrals.defer({
-      lineno: 358
+      lineno: 359
     });
     onready = function() {
       var _ref1;
@@ -699,7 +700,7 @@
       document.addEventListener('DOMContentLoaded', onready);
     }
     oven.load(__iced_deferrals.defer({
-      lineno: 366
+      lineno: 367
     }));
     __iced_deferrals._fulfill();
   })(function() {
