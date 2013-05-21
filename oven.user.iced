@@ -28,6 +28,7 @@
 // @namespace		http://project.quietmusic.org/2012/userscript/oven/
 // @description		Google+ Userscript Framework
 // @include *
+// @grant GM_xmlhttpRequest
 // @run-at document-start
 // ==/UserScript==
 ###
@@ -38,7 +39,7 @@ if not window.ExtOvenEval
   update_code = window.localStorage['ExtOvenCode']
   if update_code?
     window.ExtOvenEval = true
-    window.eval '//@ sourceURL=OvenCode.user.js\n' + update_code
+    eval '//@ sourceURL=OvenCode.user.js\n' + update_code
     return
 else
   # if window['chrome']? and not window.chrome['extension']?
@@ -51,7 +52,7 @@ else
       e.target.contentWindow.ExtOvenEval = true
       e.target.contentWindow.eval(window.localStorage['ExtOvenCode'])
 
-    MutationObserver = window.MutationOvserver ? window.WebKitMutationObserver
+    MutationObserver = window.MutationObserver ? window.WebKitMutationObserver
     observer = new MutationObserver (mutations) ->
       mutations.forEach (mutation) ->
         if mutation.type == 'childList' and mutation.addedNodes
@@ -161,31 +162,43 @@ class Oven
     @storage['ExtOvenSnippets'] = JSON.stringify names
 
   xhr: (url, callback, bypass_cache=false) ->
-    xhr =
-      if window.XMLHttpRequest
-        new XMLHttpRequest
-      else if window.ActiveXObject
-        try
-          new ActiveXObject 'Msxml2.XMLHTTP'
-        catch _
-          try
-            new ActiveXObject 'Microsoft.XMLHTTP'
-          catch _
-            null
-
-    return null if not xhr
-
     if bypass_cache
       url += (if (/\?/).test(url) then "&" else "?") + (new Date()).getTime()
 
-    xhr.onreadystatechange = () ->
+    onreadystatechange = (xhr) ->
       if xhr.readyState == 4
         if callback
-          callback (if xhr.status == 200 then xhr.responseText else null)
+          if xhr.status == 200
+            callback xhr.responseText
+          else
+            console.log "OVEN::xhr ERROR #{xhr.status}: #{xhr.responseText}"
+            callback null
 
-    xhr.open 'GET', url, true
-    xhr.send()
-    return xhr
+    if GM_xmlhttpRequest?
+      return GM_xmlhttpRequest(
+        method: 'GET'
+        url: url
+        onreadystatechange: onreadystatechange
+      )
+    else
+      xhr =
+        if window.XMLHttpRequest
+          new XMLHttpRequest
+        else if window.ActiveXObject
+          try
+            new ActiveXObject 'Msxml2.XMLHTTP'
+          catch _
+            try
+              new ActiveXObject 'Microsoft.XMLHTTP'
+            catch _
+              null
+
+      return null if not xhr
+
+      xhr.onreadystatechange = onreadystatechange
+      xhr.open 'GET', url, true
+      xhr.send()
+      return xhr
 
   grab: (name, url, callback, bypass_cache=false) ->
     await @xhr url, defer(code), bypass_cache
@@ -257,7 +270,8 @@ class Oven
       if now - new Date(@storage['ExtOvenUpdateDate']) > @sync_interval
         if @updateUrl
           ((autocb) =>
-            await @xhr @updateUrl, defer(code), bypass_cache
+            await @xhr @updateUrl, defer(code),
+              bypass_cache or not @storage['ExtOvenCode']
             if code?
               @storage['ExtOvenCode'] = code
               @storage['ExtOvenUpdateDate'] = now
@@ -295,7 +309,7 @@ class Oven
       @status[name] = 'loaded'
 
   execute: (code, name='OVEN.execute') ->
-    fn = window.eval """
+    fn = eval """
     //@ sourceURL=#{name}.oven.js
     (function (oven) { try {
       

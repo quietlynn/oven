@@ -30,6 +30,7 @@
 // @namespace		http://project.quietmusic.org/2012/userscript/oven/
 // @description		Google+ Userscript Framework
 // @include *
+// @grant GM_xmlhttpRequest
 // @run-at document-start
 // ==/UserScript==
 */
@@ -86,7 +87,7 @@
     update_code = window.localStorage['ExtOvenCode'];
     if (update_code != null) {
       window.ExtOvenEval = true;
-      window["eval"]('//@ sourceURL=OvenCode.user.js\n' + update_code);
+      eval('//@ sourceURL=OvenCode.user.js\n' + update_code);
       return;
     }
   } else {
@@ -97,7 +98,7 @@
         e.target.contentWindow.ExtOvenEval = true;
         return e.target.contentWindow["eval"](window.localStorage['ExtOvenCode']);
       };
-      MutationObserver = (_ref = window.MutationOvserver) != null ? _ref : window.WebKitMutationObserver;
+      MutationObserver = (_ref = window.MutationObserver) != null ? _ref : window.WebKitMutationObserver;
       observer = new MutationObserver(function(mutations) {
         return mutations.forEach(function(mutation) {
           var el, ell, result, _i, _len, _ref1, _results;
@@ -223,7 +224,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 132
+          lineno: 133
         }), 'bypass_cache');
         __iced_deferrals._fulfill();
       })(function() {
@@ -240,7 +241,7 @@
                   return data = arguments[0];
                 };
               })(),
-              lineno: 137
+              lineno: 138
             }), 'bypass_cache');
             __iced_deferrals._fulfill();
           })(function() {
@@ -291,37 +292,51 @@
     };
 
     Oven.prototype.xhr = function(url, callback, bypass_cache) {
-      var xhr;
+      var onreadystatechange, xhr;
       if (bypass_cache == null) bypass_cache = false;
-      xhr = (function() {
-        if (window.XMLHttpRequest) {
-          return new XMLHttpRequest;
-        } else if (window.ActiveXObject) {
-          try {
-            return new ActiveXObject('Msxml2.XMLHTTP');
-          } catch (_) {
-            try {
-              return new ActiveXObject('Microsoft.XMLHTTP');
-            } catch (_) {
-              return null;
-            }
-          }
-        }
-      })();
-      if (!xhr) return null;
       if (bypass_cache) {
         url += (/\?/.test(url) ? "&" : "?") + (new Date()).getTime();
       }
-      xhr.onreadystatechange = function() {
+      onreadystatechange = function(xhr) {
         if (xhr.readyState === 4) {
           if (callback) {
-            return callback((xhr.status === 200 ? xhr.responseText : null));
+            if (xhr.status === 200) {
+              return callback(xhr.responseText);
+            } else {
+              console.log("OVEN::xhr ERROR " + xhr.status + ": " + xhr.responseText);
+              return callback(null);
+            }
           }
         }
       };
-      xhr.open('GET', url, true);
-      xhr.send();
-      return xhr;
+      if (typeof GM_xmlhttpRequest !== "undefined" && GM_xmlhttpRequest !== null) {
+        return GM_xmlhttpRequest({
+          method: 'GET',
+          url: url,
+          onreadystatechange: onreadystatechange
+        });
+      } else {
+        xhr = (function() {
+          if (window.XMLHttpRequest) {
+            return new XMLHttpRequest;
+          } else if (window.ActiveXObject) {
+            try {
+              return new ActiveXObject('Msxml2.XMLHTTP');
+            } catch (_) {
+              try {
+                return new ActiveXObject('Microsoft.XMLHTTP');
+              } catch (_) {
+                return null;
+              }
+            }
+          }
+        })();
+        if (!xhr) return null;
+        xhr.onreadystatechange = onreadystatechange;
+        xhr.open('GET', url, true);
+        xhr.send();
+        return xhr;
+      }
     };
 
     Oven.prototype.grab = function(name, url, callback, bypass_cache) {
@@ -342,7 +357,7 @@
               return code = arguments[0];
             };
           })(),
-          lineno: 190
+          lineno: 203
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -373,7 +388,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 199
+          lineno: 212
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -388,7 +403,7 @@
                   funcname: "Oven.install"
                 });
                 _this.install_all(data.missing, __iced_deferrals.defer({
-                  lineno: 203
+                  lineno: 216
                 }), bypass_cache);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -423,7 +438,7 @@
         for (dep_name in deps) {
           dep_url = deps[dep_name];
           _this.install(dep_name, dep_url, __iced_deferrals.defer({
-            lineno: 212
+            lineno: 225
           }), bypass_cache);
         }
         __iced_deferrals._fulfill();
@@ -505,8 +520,8 @@
                       return code = arguments[0];
                     };
                   })(),
-                  lineno: 259
-                }), bypass_cache);
+                  lineno: 272
+                }), bypass_cache || !_this.storage['ExtOvenCode']);
                 __iced_deferrals._fulfill();
               })(function() {
                 if (typeof code !== "undefined" && code !== null) {
@@ -518,7 +533,7 @@
                 return;
               });
             })(__iced_deferrals.defer({
-              lineno: 263
+              lineno: 277
             }));
           }
         }
@@ -537,7 +552,7 @@
                     filename: "oven.user.iced"
                   });
                   _this.install(name, data.url, __iced_deferrals.defer({
-                    lineno: 268
+                    lineno: 282
                   }), bypass_cache);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -545,7 +560,7 @@
                   return;
                 });
               })(__iced_deferrals.defer({
-                lineno: 270
+                lineno: 284
               }), name, data.builtin);
             } else {
               _this.snippets[name].last_update = now;
@@ -596,7 +611,7 @@
     Oven.prototype.execute = function(code, name) {
       var fn;
       if (name == null) name = 'OVEN.execute';
-      fn = window["eval"]("//@ sourceURL=" + name + ".oven.js\n(function (oven) { try {\n  \n" + code + "\n\n} catch (ex) { console.log(ex.toString()); } })");
+      fn = eval("//@ sourceURL=" + name + ".oven.js\n(function (oven) { try {\n  \n" + code + "\n\n} catch (ex) { console.log(ex.toString()); } })");
       return fn(this.api);
     };
 
@@ -670,7 +685,7 @@
       filename: "oven.user.iced"
     });
     d = __iced_deferrals.defer({
-      lineno: 344
+      lineno: 358
     });
     onready = function() {
       var _ref1;
@@ -684,7 +699,7 @@
       document.addEventListener('DOMContentLoaded', onready);
     }
     oven.load(__iced_deferrals.defer({
-      lineno: 352
+      lineno: 366
     }));
     __iced_deferrals._fulfill();
   })(function() {
