@@ -53,19 +53,23 @@ else
       e.target.contentWindow.eval(window.localStorage['ExtOvenCode'])
 
     MutationObserver = window.MutationObserver ? window.WebKitMutationObserver
-    observer = new MutationObserver (mutations) ->
-      mutations.forEach (mutation) ->
-        if mutation.type == 'childList' and mutation.addedNodes
-            for el in mutation.addedNodes
-              if el.tagName == 'IFRAME'
-                el.addEventListener 'load', on_frame_loaded, false
-              if el.querySelector and (result = el.querySelectorAll('iframe'))
-                for ell in result
-                  ell.addEventListener 'load', on_frame_loaded, false
+    if !MutationObserver and unsafeWindow?
+      MutationObserver = (unsafeWindow.MutationObserver ?
+        unsafeWindow.WebKitMutationObserver)
+    if MutationObserver
+      observer = new MutationObserver (mutations) ->
+        mutations.forEach (mutation) ->
+          if mutation.type == 'childList' and mutation.addedNodes
+              for el in mutation.addedNodes
+                if el.tagName == 'IFRAME'
+                  el.addEventListener 'load', on_frame_loaded, false
+                if el.querySelector and (result = el.querySelectorAll('iframe'))
+                  for ell in result
+                    ell.addEventListener 'load', on_frame_loaded, false
 
-    observer.observe document,
-      childList: true
-      subtree: true
+      observer.observe document,
+        childList: true
+        subtree: true
     
 
 class Oven

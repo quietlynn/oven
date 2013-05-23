@@ -37,7 +37,7 @@
 
 
 (function() {
-  var MutationObserver, Oven, d, observer, on_frame_loaded, onready, oven, update_code, __iced_deferrals, __iced_k, _ref,
+  var MutationObserver, Oven, d, observer, on_frame_loaded, onready, oven, update_code, __iced_deferrals, __iced_k, _ref, _ref1,
     __slice = [].slice,
     _this = this;
 
@@ -99,46 +99,51 @@
         return e.target.contentWindow["eval"](window.localStorage['ExtOvenCode']);
       };
       MutationObserver = (_ref = window.MutationObserver) != null ? _ref : window.WebKitMutationObserver;
-      observer = new MutationObserver(function(mutations) {
-        return mutations.forEach(function(mutation) {
-          var el, ell, result, _i, _len, _ref1, _results;
-          if (mutation.type === 'childList' && mutation.addedNodes) {
-            _ref1 = mutation.addedNodes;
-            _results = [];
-            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-              el = _ref1[_i];
-              if (el.tagName === 'IFRAME') {
-                el.addEventListener('load', on_frame_loaded, false);
+      if (!MutationObserver && (typeof unsafeWindow !== "undefined" && unsafeWindow !== null)) {
+        MutationObserver = (_ref1 = unsafeWindow.MutationObserver) != null ? _ref1 : unsafeWindow.WebKitMutationObserver;
+      }
+      if (MutationObserver) {
+        observer = new MutationObserver(function(mutations) {
+          return mutations.forEach(function(mutation) {
+            var el, ell, result, _i, _len, _ref2, _results;
+            if (mutation.type === 'childList' && mutation.addedNodes) {
+              _ref2 = mutation.addedNodes;
+              _results = [];
+              for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+                el = _ref2[_i];
+                if (el.tagName === 'IFRAME') {
+                  el.addEventListener('load', on_frame_loaded, false);
+                }
+                if (el.querySelector && (result = el.querySelectorAll('iframe'))) {
+                  _results.push((function() {
+                    var _j, _len1, _results1;
+                    _results1 = [];
+                    for (_j = 0, _len1 = result.length; _j < _len1; _j++) {
+                      ell = result[_j];
+                      _results1.push(ell.addEventListener('load', on_frame_loaded, false));
+                    }
+                    return _results1;
+                  })());
+                } else {
+                  _results.push(void 0);
+                }
               }
-              if (el.querySelector && (result = el.querySelectorAll('iframe'))) {
-                _results.push((function() {
-                  var _j, _len1, _results1;
-                  _results1 = [];
-                  for (_j = 0, _len1 = result.length; _j < _len1; _j++) {
-                    ell = result[_j];
-                    _results1.push(ell.addEventListener('load', on_frame_loaded, false));
-                  }
-                  return _results1;
-                })());
-              } else {
-                _results.push(void 0);
-              }
+              return _results;
             }
-            return _results;
-          }
+          });
         });
-      });
-      observer.observe(document, {
-        childList: true,
-        subtree: true
-      });
+        observer.observe(document, {
+          childList: true,
+          subtree: true
+        });
+      }
     }
   }
 
   Oven = (function() {
 
     function Oven() {
-      var _ref1;
+      var _ref2;
       this.api = {
         lang: {},
         manager: this
@@ -148,11 +153,11 @@
       this.storage = window.localStorage;
       this.sync_interval = 0;
       this.version = 0;
-      this.updateUrl = (_ref1 = this.storage['ExtOvenUpdateUrl']) != null ? _ref1 : 'https://github.com/quietlynn/oven/raw/master/oven.user.js';
+      this.updateUrl = (_ref2 = this.storage['ExtOvenUpdateUrl']) != null ? _ref2 : 'https://github.com/quietlynn/oven/raw/master/oven.user.js';
     }
 
     Oven.prototype.load = function(callback) {
-      var data, name, snip, _i, _len, _ref1,
+      var data, name, snip, _i, _len, _ref2,
         _this = this;
       snip = this.storage['ExtOvenSnippets'];
       if (!snip) {
@@ -166,9 +171,9 @@
           return _this.load(callback);
         });
       }
-      _ref1 = JSON.parse(this.storage['ExtOvenSnippets']);
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        name = _ref1[_i];
+      _ref2 = JSON.parse(this.storage['ExtOvenSnippets']);
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        name = _ref2[_i];
         data = JSON.parse(this.storage['ExtOvenSnippet_' + name]);
         this.snippets[name] = data;
       }
@@ -177,10 +182,10 @@
     };
 
     Oven.prototype.version_compare = function(v1, v2) {
-      var i, i1, i2, sv1, sv2, _i, _ref1;
+      var i, i1, i2, sv1, sv2, _i, _ref2;
       sv1 = v1.split(".");
       sv2 = v2.split(".");
-      for (i = _i = 0, _ref1 = sv1.length - 1; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+      for (i = _i = 0, _ref2 = sv1.length - 1; 0 <= _ref2 ? _i <= _ref2 : _i >= _ref2; i = 0 <= _ref2 ? ++_i : --_i) {
         if (sv2.length - 1 < i) return 1;
         i1 = parseInt(sv1[i]);
         i2 = parseInt(sv2[i]);
@@ -224,7 +229,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 133
+          lineno: 137
         }), 'bypass_cache');
         __iced_deferrals._fulfill();
       })(function() {
@@ -241,7 +246,7 @@
                   return data = arguments[0];
                 };
               })(),
-              lineno: 138
+              lineno: 142
             }), 'bypass_cache');
             __iced_deferrals._fulfill();
           })(function() {
@@ -279,12 +284,12 @@
     };
 
     Oven.prototype.save = function() {
-      var data, name, names, _ref1;
+      var data, name, names, _ref2;
       console.log('Oven::save');
       names = [];
-      _ref1 = this.snippets;
-      for (name in _ref1) {
-        data = _ref1[name];
+      _ref2 = this.snippets;
+      for (name in _ref2) {
+        data = _ref2[name];
         this.storage['ExtOvenSnippet_' + name] = JSON.stringify(data);
         names.push(name);
       }
@@ -358,7 +363,7 @@
               return code = arguments[0];
             };
           })(),
-          lineno: 204
+          lineno: 208
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -389,7 +394,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 213
+          lineno: 217
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -404,7 +409,7 @@
                   funcname: "Oven.install"
                 });
                 _this.install_all(data.missing, __iced_deferrals.defer({
-                  lineno: 217
+                  lineno: 221
                 }), bypass_cache);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -439,7 +444,7 @@
         for (dep_name in deps) {
           dep_url = deps[dep_name];
           _this.install(dep_name, dep_url, __iced_deferrals.defer({
-            lineno: 226
+            lineno: 230
           }), bypass_cache);
         }
         __iced_deferrals._fulfill();
@@ -449,7 +454,7 @@
     };
 
     Oven.prototype.parse = function(name, url, code) {
-      var data, dep, dep_url, field, reg, result, value, _, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+      var data, dep, dep_url, field, reg, result, value, _, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
       data = {};
       data.deps = [];
       data.opts = [];
@@ -457,14 +462,14 @@
       while (result = reg.exec(code)) {
         _ = result[0], field = result[1], value = result[2];
         if (field === 'require') {
-          _ref1 = value.split(/\s+/), dep = _ref1[0], dep_url = _ref1[1];
+          _ref2 = value.split(/\s+/), dep = _ref2[0], dep_url = _ref2[1];
           data.deps.push(dep);
           if (!this.has(dep)) {
-            if ((_ref2 = data.missing) == null) data.missing = {};
+            if ((_ref3 = data.missing) == null) data.missing = {};
             data.missing[dep] = dep_url;
           }
         } else if (field === 'optional') {
-          _ref3 = value.split(/\s+/), dep = _ref3[0], dep_url = _ref3[1];
+          _ref4 = value.split(/\s+/), dep = _ref4[0], dep_url = _ref4[1];
           data.opts.push(dep);
         } else if (['deps', 'opts', 'builtin', 'disabled'].indexOf(field) < 0) {
           data[field] = value;
@@ -472,9 +477,9 @@
       }
       data.url = url;
       data.last_update = new Date;
-      if ((_ref4 = data.version) == null) data.version = 0;
-      if ((_ref5 = data.name) == null) data.name = name != null ? name : url;
-      if ((_ref6 = data.display) == null) data.display = data.name;
+      if ((_ref5 = data.version) == null) data.version = 0;
+      if ((_ref6 = data.name) == null) data.name = name != null ? name : url;
+      if ((_ref7 = data.display) == null) data.display = data.name;
       if (data.lang) {
         this.run('oven.lang.' + data.lang);
         try {
@@ -498,7 +503,7 @@
       console.log('Oven::sync');
       now = new Date();
       (function(__iced_k) {
-        var _ref1;
+        var _ref2;
         __iced_deferrals = new iced.Deferrals(__iced_k, {
           parent: ___iced_passed_deferral,
           filename: "oven.user.iced",
@@ -521,7 +526,7 @@
                       return code = arguments[0];
                     };
                   })(),
-                  lineno: 273
+                  lineno: 277
                 }), bypass_cache || !_this.storage['ExtOvenCode']);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -534,13 +539,13 @@
                 return;
               });
             })(__iced_deferrals.defer({
-              lineno: 278
+              lineno: 282
             }));
           }
         }
-        _ref1 = _this.snippets;
-        for (name in _ref1) {
-          data = _ref1[name];
+        _ref2 = _this.snippets;
+        for (name in _ref2) {
+          data = _ref2[name];
           if (data.url !== null && !_this.snippets[name].disabled) {
             if (now - new Date(data.last_update) > _this.sync_interval) {
               (function(autocb, name, builtin) {
@@ -553,7 +558,7 @@
                     filename: "oven.user.iced"
                   });
                   _this.install(name, data.url, __iced_deferrals.defer({
-                    lineno: 283
+                    lineno: 287
                   }), bypass_cache);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -561,7 +566,7 @@
                   return;
                 });
               })(__iced_deferrals.defer({
-                lineno: 285
+                lineno: 289
               }), name, data.builtin);
             } else {
               _this.snippets[name].last_update = now;
@@ -588,18 +593,18 @@
     };
 
     Oven.prototype.run = function(name) {
-      var data, dep, opt, _i, _j, _len, _len1, _ref1, _ref2;
+      var data, dep, opt, _i, _j, _len, _len1, _ref2, _ref3;
       if (this.status[name] !== 'loaded' && !this.snippets[name].disabled) {
         data = this.snippets[name];
-        _ref1 = data.deps;
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          dep = _ref1[_i];
+        _ref2 = data.deps;
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          dep = _ref2[_i];
           this.run(dep);
         }
         if (data.opts) {
-          _ref2 = data.opts;
-          for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-            opt = _ref2[_j];
+          _ref3 = data.opts;
+          for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
+            opt = _ref3[_j];
             if (this.has(opt)) this.run(opt);
           }
         }
@@ -626,12 +631,12 @@
     };
 
     Oven.prototype.remove = function(name) {
-      var data, snip, snips, _i, _len, _ref1, _results;
+      var data, snip, snips, _i, _len, _ref2, _results;
       delete this.snippets[name];
       snips = [];
-      _ref1 = this.snippets;
-      for (snip in _ref1) {
-        data = _ref1[snip];
+      _ref2 = this.snippets;
+      for (snip in _ref2) {
+        data = _ref2[snip];
         if (data.deps.indexOf(name) >= 0) snips.push(snip);
       }
       _results = [];
@@ -643,11 +648,11 @@
     };
 
     Oven.prototype.enable = function(name) {
-      var data, dep, _i, _len, _ref1;
+      var data, dep, _i, _len, _ref2;
       data = this.snippets[name];
-      _ref1 = data.deps;
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        dep = _ref1[_i];
+      _ref2 = data.deps;
+      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+        dep = _ref2[_i];
         this.enable(dep);
       }
       if (data.disabled) {
@@ -657,13 +662,13 @@
     };
 
     Oven.prototype.disable = function(name) {
-      var data, snip, _ref1, _results;
+      var data, snip, _ref2, _results;
       console.log('OVEN::disable ' + name);
       this.snippets[name].disabled = true;
-      _ref1 = this.snippets;
+      _ref2 = this.snippets;
       _results = [];
-      for (snip in _ref1) {
-        data = _ref1[snip];
+      for (snip in _ref2) {
+        data = _ref2[snip];
         if (data.deps.indexOf(name) >= 0) {
           _results.push(this.disable(snip));
         } else {
@@ -686,11 +691,11 @@
       filename: "oven.user.iced"
     });
     d = __iced_deferrals.defer({
-      lineno: 359
+      lineno: 363
     });
     onready = function() {
-      var _ref1;
-      if ((_ref1 = document.querySelector('base')) != null ? _ref1.href.match(/^https:\/\/plus\.google\.com(\/u\/\d+)?\/?/) : void 0) {
+      var _ref2;
+      if ((_ref2 = document.querySelector('base')) != null ? _ref2.href.match(/^https:\/\/plus\.google\.com(\/u\/\d+)?\/?/) : void 0) {
         return d();
       }
     };
@@ -700,7 +705,7 @@
       document.addEventListener('DOMContentLoaded', onready);
     }
     oven.load(__iced_deferrals.defer({
-      lineno: 367
+      lineno: 371
     }));
     __iced_deferrals._fulfill();
   })(function() {
