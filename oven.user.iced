@@ -39,7 +39,7 @@ if not window.ExtOvenEval
   update_code = window.localStorage['ExtOvenCode']
   if update_code?
     window.ExtOvenEval = true
-    eval '//@ sourceURL=OvenCode.user.js\n' + update_code
+    eval '//# sourceURL=OvenCode.user.js\n' + update_code
     return
 else
   # if window['chrome']? and not window.chrome['extension']?
@@ -167,7 +167,8 @@ class Oven
 
   xhr: (url, callback, bypass_cache=false) ->
     if bypass_cache
-      url += (if (/\?/).test(url) then "&" else "?") + (new Date()).getTime()
+      url += (if (/\?/).test(url) then "&" else "?") +
+        ("_=" + (new Date()).getTime())
 
     onreadystatechange = (xhr) ->
       xhr = xhr.target if xhr.target
@@ -241,7 +242,7 @@ class Oven
       if field == 'require'
         [dep, dep_url] = value.split /\s+/
         data.deps.push dep
-        if not @has(dep)
+        if not @installed(dep)
           data.missing ?= {}
           data.missing[dep] = dep_url
       else if field == 'optional'
@@ -308,14 +309,14 @@ class Oven
         @run dep
       if data.opts
         for opt in data.opts
-          @run opt if @has(opt)
+          @run opt if @installed(opt)
       console.log 'Oven::run ' + name
       @execute @snippets[name].code, name
       @status[name] = 'loaded'
 
   execute: (code, name='OVEN.execute') ->
     fn = eval """
-    //@ sourceURL=#{name}.oven.js
+    //# sourceURL=#{name}.oven.js
     (function (oven) { try {
       
     #{code}
@@ -324,7 +325,9 @@ class Oven
     """
     fn(@api)
 
-  has: (name) -> @snippets[name]?
+  installed: (name) -> @snippets[name]?
+
+  has: (name) -> @status[name] == 'loaded'
 
   add: (name, data) ->
     @snippets[name] = data
@@ -373,4 +376,4 @@ await
 oven.cook()
 if window.self == window.top
   window.addEventListener 'load', ->
-    oven.sync()
+    oven.sync(null, 'bypass_cache')

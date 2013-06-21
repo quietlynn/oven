@@ -87,7 +87,7 @@
     update_code = window.localStorage['ExtOvenCode'];
     if (update_code != null) {
       window.ExtOvenEval = true;
-      eval('//@ sourceURL=OvenCode.user.js\n' + update_code);
+      eval('//# sourceURL=OvenCode.user.js\n' + update_code);
       return;
     }
   } else {
@@ -300,7 +300,7 @@
       var onreadystatechange, xhr;
       if (bypass_cache == null) bypass_cache = false;
       if (bypass_cache) {
-        url += (/\?/.test(url) ? "&" : "?") + (new Date()).getTime();
+        url += (/\?/.test(url) ? "&" : "?") + ("_=" + (new Date()).getTime());
       }
       onreadystatechange = function(xhr) {
         if (xhr.target) xhr = xhr.target;
@@ -363,7 +363,7 @@
               return code = arguments[0];
             };
           })(),
-          lineno: 208
+          lineno: 209
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -394,7 +394,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 217
+          lineno: 218
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -409,7 +409,7 @@
                   funcname: "Oven.install"
                 });
                 _this.install_all(data.missing, __iced_deferrals.defer({
-                  lineno: 221
+                  lineno: 222
                 }), bypass_cache);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -444,7 +444,7 @@
         for (dep_name in deps) {
           dep_url = deps[dep_name];
           _this.install(dep_name, dep_url, __iced_deferrals.defer({
-            lineno: 230
+            lineno: 231
           }), bypass_cache);
         }
         __iced_deferrals._fulfill();
@@ -464,7 +464,7 @@
         if (field === 'require') {
           _ref2 = value.split(/\s+/), dep = _ref2[0], dep_url = _ref2[1];
           data.deps.push(dep);
-          if (!this.has(dep)) {
+          if (!this.installed(dep)) {
             if ((_ref3 = data.missing) == null) data.missing = {};
             data.missing[dep] = dep_url;
           }
@@ -526,7 +526,7 @@
                       return code = arguments[0];
                     };
                   })(),
-                  lineno: 277
+                  lineno: 278
                 }), bypass_cache || !_this.storage['ExtOvenCode']);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -539,7 +539,7 @@
                 return;
               });
             })(__iced_deferrals.defer({
-              lineno: 282
+              lineno: 283
             }));
           }
         }
@@ -558,7 +558,7 @@
                     filename: "oven.user.iced"
                   });
                   _this.install(name, data.url, __iced_deferrals.defer({
-                    lineno: 287
+                    lineno: 288
                   }), bypass_cache);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -566,7 +566,7 @@
                   return;
                 });
               })(__iced_deferrals.defer({
-                lineno: 289
+                lineno: 290
               }), name, data.builtin);
             } else {
               _this.snippets[name].last_update = now;
@@ -605,7 +605,7 @@
           _ref3 = data.opts;
           for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
             opt = _ref3[_j];
-            if (this.has(opt)) this.run(opt);
+            if (this.installed(opt)) this.run(opt);
           }
         }
         console.log('Oven::run ' + name);
@@ -617,12 +617,16 @@
     Oven.prototype.execute = function(code, name) {
       var fn;
       if (name == null) name = 'OVEN.execute';
-      fn = eval("//@ sourceURL=" + name + ".oven.js\n(function (oven) { try {\n  \n" + code + "\n\n} catch (ex) { console.log(ex.toString()); } })");
+      fn = eval("//# sourceURL=" + name + ".oven.js\n(function (oven) { try {\n  \n" + code + "\n\n} catch (ex) { console.log(ex.toString()); } })");
       return fn(this.api);
     };
 
-    Oven.prototype.has = function(name) {
+    Oven.prototype.installed = function(name) {
       return this.snippets[name] != null;
+    };
+
+    Oven.prototype.has = function(name) {
+      return this.status[name] === 'loaded';
     };
 
     Oven.prototype.add = function(name, data) {
@@ -691,7 +695,7 @@
       filename: "oven.user.iced"
     });
     d = __iced_deferrals.defer({
-      lineno: 363
+      lineno: 366
     });
     onready = function() {
       var _ref2;
@@ -705,14 +709,14 @@
       document.addEventListener('DOMContentLoaded', onready);
     }
     oven.load(__iced_deferrals.defer({
-      lineno: 371
+      lineno: 374
     }));
     __iced_deferrals._fulfill();
   })(function() {
     oven.cook();
     if (window.self === window.top) {
       return window.addEventListener('load', function() {
-        return oven.sync();
+        return oven.sync(null, 'bypass_cache');
       });
     }
   });
