@@ -26,9 +26,9 @@
 
 /*
 // ==UserScript==
-// @name 		Google+ Userscript Framework
-// @namespace		http://project.quietmusic.org/2012/userscript/oven/
-// @description		Google+ Userscript Framework
+// @name Google+ Userscript Framework
+// @namespace http://project.quietmusic.org/2012/userscript/oven/
+// @description Google+ Userscript Framework
 // @include *
 // @grant GM_xmlhttpRequest
 // @run-at document-start
@@ -91,7 +91,7 @@
       return;
     }
   } else {
-    if (true) {
+    if ((window['chrome'] != null) && (window.chrome['extension'] == null)) {
       on_frame_loaded = function(e) {
         if (e.target.src.indexOf('https://plus.google.com/') !== 0) return;
         if (e.target.contentWindow.ExtOvenEval) return;
@@ -229,7 +229,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 137
+          lineno: 136
         }), 'bypass_cache');
         __iced_deferrals._fulfill();
       })(function() {
@@ -246,7 +246,7 @@
                   return data = arguments[0];
                 };
               })(),
-              lineno: 142
+              lineno: 141
             }), 'bypass_cache');
             __iced_deferrals._fulfill();
           })(function() {
@@ -363,7 +363,7 @@
               return code = arguments[0];
             };
           })(),
-          lineno: 209
+          lineno: 208
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -394,7 +394,7 @@
               return data = arguments[0];
             };
           })(),
-          lineno: 218
+          lineno: 217
         }), bypass_cache);
         __iced_deferrals._fulfill();
       })(function() {
@@ -409,7 +409,7 @@
                   funcname: "Oven.install"
                 });
                 _this.install_all(data.missing, __iced_deferrals.defer({
-                  lineno: 222
+                  lineno: 221
                 }), bypass_cache);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -444,7 +444,7 @@
         for (dep_name in deps) {
           dep_url = deps[dep_name];
           _this.install(dep_name, dep_url, __iced_deferrals.defer({
-            lineno: 231
+            lineno: 230
           }), bypass_cache);
         }
         __iced_deferrals._fulfill();
@@ -526,7 +526,7 @@
                       return code = arguments[0];
                     };
                   })(),
-                  lineno: 278
+                  lineno: 277
                 }), bypass_cache || !_this.storage['ExtOvenCode']);
                 __iced_deferrals._fulfill();
               })(function() {
@@ -539,7 +539,7 @@
                 return;
               });
             })(__iced_deferrals.defer({
-              lineno: 283
+              lineno: 282
             }));
           }
         }
@@ -558,7 +558,7 @@
                     filename: "oven.user.iced"
                   });
                   _this.install(name, data.url, __iced_deferrals.defer({
-                    lineno: 288
+                    lineno: 287
                   }), bypass_cache);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -566,7 +566,7 @@
                   return;
                 });
               })(__iced_deferrals.defer({
-                lineno: 290
+                lineno: 289
               }), name, data.builtin);
             } else {
               _this.snippets[name].last_update = now;
@@ -695,7 +695,7 @@
       filename: "oven.user.iced"
     });
     d = __iced_deferrals.defer({
-      lineno: 366
+      lineno: 365
     });
     onready = function() {
       var _ref2;
@@ -709,7 +709,7 @@
       document.addEventListener('DOMContentLoaded', onready);
     }
     oven.load(__iced_deferrals.defer({
-      lineno: 374
+      lineno: 373
     }));
     __iced_deferrals._fulfill();
   })(function() {

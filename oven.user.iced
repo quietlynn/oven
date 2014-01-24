@@ -24,9 +24,9 @@
 
 ###
 // ==UserScript==
-// @name 		Google+ Userscript Framework
-// @namespace		http://project.quietmusic.org/2012/userscript/oven/
-// @description		Google+ Userscript Framework
+// @name Google+ Userscript Framework
+// @namespace http://project.quietmusic.org/2012/userscript/oven/
+// @description Google+ Userscript Framework
 // @include *
 // @grant GM_xmlhttpRequest
 // @run-at document-start
@@ -42,8 +42,7 @@ if not window.ExtOvenEval
     eval '//# sourceURL=OvenCode.user.js\n' + update_code
     return
 else
-  # if window['chrome']? and not window.chrome['extension']?
-  if true
+  if window['chrome']? and not window.chrome['extension']?
     # Userscripts in Chrome cannot access iframes.
     # However, Chrome extensions can.
     on_frame_loaded = (e) ->
