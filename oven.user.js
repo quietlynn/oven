@@ -157,7 +157,7 @@
       this.status = {};
       this.storage = window.localStorage;
       this.sync_interval = 0;
-      this.version = 0;
+      this.version = 1;
       this.updateUrl = (_ref2 = this.storage['ExtOvenUpdateUrl']) != null ? _ref2 : 'https://github.com/quietlynn/oven/raw/master/oven.user.js';
     }
 
@@ -172,18 +172,28 @@
         })(this));
         return false;
       }
+      try {
+        _ref2 = JSON.parse(this.storage['ExtOvenSnippets']);
+        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+          name = _ref2[_i];
+          data = JSON.parse(this.storage['ExtOvenSnippet_' + name]);
+          this.snippets[name] = data;
+        }
+      } catch (_error) {
+        this.panic();
+        this.init((function(_this) {
+          return function() {
+            return _this.load(callback);
+          };
+        })(this));
+        return false;
+      }
       if (this.version > this.storage['ExtOvenVersion']) {
         this.update((function(_this) {
           return function() {
             return _this.load(callback);
           };
         })(this));
-      }
-      _ref2 = JSON.parse(this.storage['ExtOvenSnippets']);
-      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-        name = _ref2[_i];
-        data = JSON.parse(this.storage['ExtOvenSnippet_' + name]);
-        this.snippets[name] = data;
       }
       if (callback) {
         callback();
@@ -247,7 +257,7 @@
                 return data = arguments[0];
               };
             })(),
-            lineno: 136
+            lineno: 141
           }), 'bypass_cache');
           __iced_deferrals._fulfill();
         });
@@ -266,7 +276,7 @@
                     return data = arguments[0];
                   };
                 })(),
-                lineno: 141
+                lineno: 146
               }), 'bypass_cache');
               __iced_deferrals._fulfill();
             })(function() {
@@ -303,6 +313,7 @@
 
     Oven.prototype.update = function(callback) {
       this.storage['ExtOvenVersion'] = this.version;
+      this.snippets['io.github.maxtaco.iced.compiler'].url = 'https://maxtaco.github.io/coffee-script/extras/iced-coffee-script-1.8.0-a.js';
       return callback();
     };
 
@@ -396,7 +407,7 @@
                 return code = arguments[0];
               };
             })(),
-            lineno: 208
+            lineno: 216
           }), bypass_cache);
           __iced_deferrals._fulfill();
         });
@@ -436,7 +447,7 @@
                 return data = arguments[0];
               };
             })(),
-            lineno: 217
+            lineno: 225
           }), bypass_cache);
           __iced_deferrals._fulfill();
         });
@@ -455,7 +466,7 @@
                     funcname: "Oven.install"
                   });
                   _this.install_all(data.missing, __iced_deferrals.defer({
-                    lineno: 221
+                    lineno: 229
                   }), bypass_cache);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -493,7 +504,7 @@
           for (dep_name in deps) {
             dep_url = deps[dep_name];
             _this.install(dep_name, dep_url, __iced_deferrals.defer({
-              lineno: 230
+              lineno: 238
             }), bypass_cache);
           }
           __iced_deferrals._fulfill();
@@ -591,7 +602,7 @@
                         return code = arguments[0];
                       };
                     })(),
-                    lineno: 277
+                    lineno: 285
                   }), bypass_cache || !_this.storage['ExtOvenCode']);
                   __iced_deferrals._fulfill();
                 })(function() {
@@ -604,7 +615,7 @@
                   return;
                 });
               })(__iced_deferrals.defer({
-                lineno: 282
+                lineno: 290
               }));
             }
           }
@@ -623,7 +634,7 @@
                       filename: "/run/media/meow/hdd/backup/catland/20140628/home/meow/workspace/oven/oven.user.iced"
                     });
                     _this.install(name, data.url, __iced_deferrals.defer({
-                      lineno: 287
+                      lineno: 295
                     }), bypass_cache);
                     __iced_deferrals._fulfill();
                   })(function() {
@@ -631,7 +642,7 @@
                     return;
                   });
                 })(__iced_deferrals.defer({
-                  lineno: 289
+                  lineno: 297
                 }), name, data.builtin);
               } else {
                 _this.snippets[name].last_update = now;
@@ -774,7 +785,7 @@
         filename: "/run/media/meow/hdd/backup/catland/20140628/home/meow/workspace/oven/oven.user.iced"
       });
       d = __iced_deferrals.defer({
-        lineno: 365
+        lineno: 373
       });
       onready = function() {
         var _ref2;
@@ -788,7 +799,7 @@
         document.addEventListener('DOMContentLoaded', onready);
       }
       oven.load(__iced_deferrals.defer({
-        lineno: 373
+        lineno: 381
       }));
       __iced_deferrals._fulfill();
     });

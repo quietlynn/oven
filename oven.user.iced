@@ -80,7 +80,7 @@ class Oven
     @status = {}
     @storage = window.localStorage
     @sync_interval = 0
-    @version = 0
+    @version = 1
     @updateUrl = (@storage['ExtOvenUpdateUrl'] ?
         'https://github.com/quietlynn/oven/raw/master/oven.user.js')
 
@@ -90,12 +90,17 @@ class Oven
       @init =>
         @load(callback)
       return false
+    try
+      for name in JSON.parse @storage['ExtOvenSnippets']
+        data = JSON.parse @storage['ExtOvenSnippet_' + name]
+        @snippets[name] = data
+    catch
+      @panic()
+      @init => @load(callback)
+      return false
     if @version > @storage['ExtOvenVersion']
       @update =>
         @load(callback)
-    for name in JSON.parse @storage['ExtOvenSnippets']
-      data = JSON.parse @storage['ExtOvenSnippet_' + name]
-      @snippets[name] = data
     callback() if callback
     return true
 
@@ -154,6 +159,9 @@ class Oven
   update: (callback) ->
     # Update storage format...
     @storage['ExtOvenVersion'] = @version
+    # Update Compiler URL...
+    @snippets['io.github.maxtaco.iced.compiler'].url =
+      'https://maxtaco.github.io/coffee-script/extras/iced-coffee-script-1.8.0-a.js'
     callback()
 
   save: ->
